@@ -1,4 +1,4 @@
-![Sepix_Authenticator_ic](https://github.com/Sepehr13/Sepix-Authenticator/assets/21054209/3c95b070-9597-48f6-893e-f5054227a787)
+![Sepix_Authenticator_ic](https://github.com/Sepehr13/Sepix-Authenticator/assets/21054209/d190086d-1180-4b8d-b170-c1f65011dff3)
 
 # Sepix Authenticator
 
