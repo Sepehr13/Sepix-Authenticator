@@ -1,0 +1,90 @@
+name: Flutter
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  build_android:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      discussions: write
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install JAVA
+        uses: actions/setup-java@v1.4.4
+        with:
+          java-version: 11
+      
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2.10.0
+        with:
+          flutter-version: 3.7.12
+          channel: stable
+
+      - name: Install Dependencies
+        run: flutter pub get
+        
+      - name: Decode Keystore
+        env:
+           ENCODED_STRING: ${{ secrets.SIGNING_KEY_STORE_BASE64 }}
+           SIGNING_KEY_STORE_PATH: ${{ secrets.SIGNING_KEY_STORE_PATH }}
+        run: echo $ENCODED_STRING | base64 -d - > ./android/app/$SIGNING_KEY_STORE_PATH
+        
+      - name: Build Release Fat APK
+        env:
+           SIGNING_KEY_STORE_PATH: ${{ secrets.SIGNING_KEY_STORE_PATH }}
+           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+        run: flutter build apk --release --no-sound-null-safety
+
+      - name: Build Release Split Per ABI APK
+        env:
+           SIGNING_KEY_STORE_PATH: ${{ secrets.SIGNING_KEY_STORE_PATH }}
+           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+        run: flutter build apk --split-per-abi --release --no-sound-null-safety
+
+      - name: Upload Release Build to Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-artifacts
+          path: build/app/outputs/apk/release/
+             
+      - name: Create Github Release
+        uses: softprops/action-gh-release@v0.1.15
+        with:
+          generate_release_notes: true
+          files: |
+            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/flutter-apk/app-x86_64-release.apk
+            build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+            build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+
+  # build_ios:
+  #   runs-on: macos-latest
+
+  #   steps:
+  #     - uses: actions/checkout@v3
+      
+  #     - name: Install Flutter
+  #       uses: subosito/flutter-action@v2.10.0
+  #       with:
+  #         flutter-version: 3.7.12
+  #         channel: stable
+        
+  #     - name: Build Release IPA
+  #       run: flutter build ipa --release --no-sound-null-safety
+
+  #     - name: Upload Release Build to Artifacts
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: release-artifacts
+  #         path: build/ios/ipa/*.ipa
