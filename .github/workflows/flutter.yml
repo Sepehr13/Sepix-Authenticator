@@ -19,7 +19,7 @@ jobs:
       - name: Install JAVA
         uses: actions/setup-java@v1.4.4
         with:
-          java-version: 19
+          java-version: 11
       
       - name: Install Flutter
         uses: subosito/flutter-action@v2.10.0
