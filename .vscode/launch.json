@@ -8,9 +8,9 @@
             "name": "two_fa",
             "request": "launch",
             "type": "dart",
-            "args": [
-                "--no-sound-null-safety"
-            ]
+            // "args": [
+            //     "--no-sound-null-safety"
+            // ]
         },
         {
             "name": "two_fa (profile mode)",

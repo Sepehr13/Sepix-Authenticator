@@ -48,8 +48,8 @@ class _ScannerPageState extends State<ScannerPage> {
                 : _cameraHasAccess
                     ? MobileScanner(
                         controller: _cameraController,
-                        onDetect: (barcode, args) {
-                          Navigator.of(context).pop(barcode.rawValue);
+                        onDetect: (barcode) {
+                          Navigator.of(context).pop(barcode.raw);
                         },
                       )
                     : Center(

@@ -1,14 +1,9 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_final_fields, unused_local_variable, avoid_single_cascade_in_expression_statements, unused_element
 
-import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
-import 'package:hive/hive.dart';
 import 'package:otp/otp.dart';
-import 'package:shimmer/shimmer.dart';
 
 import '../@types/Entity.type.dart';
 
@@ -184,6 +179,5 @@ class _AddManuallyWidgetState extends State<AddManuallyWidget> {
         ),
       ),
     );
-    ;
   }
 }
