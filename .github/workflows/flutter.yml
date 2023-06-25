@@ -42,7 +42,7 @@ jobs:
            SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
            SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
            SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
-        run: flutter build apk --release --no-sound-null-safety
+        run: flutter build apk --release 
 
       - name: Build Release Split Per ABI APK
         env:
@@ -50,7 +50,7 @@ jobs:
            SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
            SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
            SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
-        run: flutter build apk --split-per-abi --release --no-sound-null-safety
+        run: flutter build apk --split-per-abi --release 
 
       - name: Upload Release Build to Artifacts
         uses: actions/upload-artifact@v3
@@ -81,7 +81,7 @@ jobs:
   #         channel: stable
         
   #     - name: Build Release IPA
-  #       run: flutter build ipa --release --no-sound-null-safety
+  #       run: flutter build ipa --release 
 
   #     - name: Upload Release Build to Artifacts
   #       uses: actions/upload-artifact@v3
