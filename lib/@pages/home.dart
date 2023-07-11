@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import '../@components/delete_action_sheet.component.dart';
@@ -70,6 +71,7 @@ class _HomePageState extends State<HomePage> {
     }
     var id = await box.add(entity);
     if (id >= 0) {
+      EasyLoading.showSuccess('Entry Added Successfully!');
       completer.complete(true);
     } else {
       completer.complete(false);
