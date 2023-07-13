@@ -1,15 +1,17 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_final_fields, unused_local_variable, avoid_single_cascade_in_expression_statements, unused_element
 
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:otp/otp.dart';
 
 import '../@types/Entity.type.dart';
 
 class AddManuallyWidget extends StatefulWidget {
   final Function(Entity) onNewEntity;
-  const AddManuallyWidget({super.key, required this.onNewEntity});
+  final BuildContext context;
+  const AddManuallyWidget(
+      {super.key, required this.context, required this.onNewEntity});
 
   @override
   State<AddManuallyWidget> createState() => _AddManuallyWidgetState();
@@ -25,13 +27,12 @@ class _AddManuallyWidgetState extends State<AddManuallyWidget> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      controller: ModalScrollController.of(widget.context),
       padding:
           EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: Container(
-        height: 400,
         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
           color: MediaQuery.of(context).platformBrightness == Brightness.dark
               ? CupertinoTheme.of(context).barBackgroundColor
               : CupertinoTheme.of(context).scaffoldBackgroundColor,
@@ -43,6 +44,22 @@ class _AddManuallyWidgetState extends State<AddManuallyWidget> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                Center(
+                  child: Container(
+                    width: 26,
+                    height: 4,
+                    decoration: BoxDecoration(
+                        color: CupertinoTheme.of(context)
+                            .textTheme
+                            .textStyle
+                            .color!
+                            .withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(50)),
+                  ),
+                ),
+                SizedBox(
+                  height: 22,
+                ),
                 CupertinoTextField(
                   controller: _nameController,
                   placeholder: 'Account Name',
@@ -90,6 +107,9 @@ class _AddManuallyWidgetState extends State<AddManuallyWidget> {
                       )
                     : Container(),
               ],
+            ),
+            SizedBox(
+              height: 16,
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -152,7 +172,11 @@ class _AddManuallyWidgetState extends State<AddManuallyWidget> {
                         : null,
                     child: Text(
                       'Add To List',
-                      style: TextStyle(color: CupertinoColors.white),
+                      style: TextStyle(
+                          color: CupertinoTheme.of(context)
+                              .textTheme
+                              .textStyle
+                              .color),
                     )),
                 SizedBox(
                   height: 8,

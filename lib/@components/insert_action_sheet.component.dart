@@ -2,6 +2,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:otp/otp.dart';
 
 import '../@pages/scanner.dart';
@@ -83,9 +84,14 @@ class InsertActionSheet extends StatelessWidget {
         CupertinoActionSheetAction(
           onPressed: () {
             Navigator.pop(context);
-            showCupertinoModalPopup(
+            showCupertinoModalBottomSheet(
                 context: context,
-                builder: (ctx) => AddManuallyWidget(onNewEntity: (entity) {
+                shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(18))),
+                builder: (ctx) => AddManuallyWidget(
+                    context: ctx,
+                    onNewEntity: (entity) {
                       onNewEntity(entity);
                     })).whenComplete(() {
               FocusManager.instance.primaryFocus?.unfocus();

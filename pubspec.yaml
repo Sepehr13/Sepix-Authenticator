@@ -43,6 +43,7 @@ dependencies:
   flutter_easyloading: ^3.0.5
   mobile_scanner: 2.1.0
   permission_handler: ^10.3.0
+  modal_bottom_sheet: ^3.0.0-pre
 dev_dependencies:
   flutter_test:
     sdk: flutter
