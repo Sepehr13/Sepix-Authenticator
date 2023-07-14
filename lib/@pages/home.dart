@@ -6,6 +6,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
+import 'package:rxdart/subjects.dart';
+import 'package:rxdart/transformers.dart';
 import '../@components/delete_action_sheet.component.dart';
 import '../@components/insert_action_sheet.component.dart';
 import '../@components/otp_card.component.dart';
@@ -23,19 +25,39 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool _isLoading = true;
-  TextEditingController _searchController = TextEditingController(text: '');
+  BehaviorSubject<String> _searchSubject = BehaviorSubject<String>();
+  TextEditingController _searchTextController = TextEditingController(text: '');
+  late StreamSubscription<String> _searchStream;
   late Timer _periodicRefreshRef;
   int _dangerTime = 8;
+  bool _isTyping = false;
+  bool _showFilteredList = false;
+  List<Entity> _filteredList = [];
+
   @override
   void initState() {
     super.initState();
     _fetchList();
     _periodicRefresh();
+    _searchStream =
+        _searchSubject.debounceTime(Duration(seconds: 1)).listen((text) {
+      if (_searchTextController.text.trim().isNotEmpty) {
+        setState(() {
+          _isTyping = false;
+          _showFilteredList = true;
+          _filteredList = Provider.of<SettingsState>(context, listen: false)
+              .list
+              .where((e) =>
+                  "${e.issuer} (${e.title})".toLowerCase().contains(text))
+              .toList();
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
-    _searchController.dispose();
+    _searchStream.cancel();
     _periodicRefreshRef.cancel();
     super.dispose();
   }
@@ -94,6 +116,14 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  get otpList {
+    if (_showFilteredList) {
+      return _filteredList;
+    } else {
+      return Provider.of<SettingsState>(context).list;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final SettingsState settingsState = Provider.of<SettingsState>(context);
@@ -102,19 +132,14 @@ class _HomePageState extends State<HomePage> {
         return Future.value(false);
       },
       child: CupertinoPageScaffold(
-          backgroundColor:
-              MediaQuery.of(context).platformBrightness == Brightness.dark
-                  ? CupertinoTheme.of(context).barBackgroundColor
-                  : CupertinoTheme.of(context).scaffoldBackgroundColor,
+          backgroundColor: CupertinoTheme.of(context).scaffoldBackgroundColor,
           child: CustomScrollView(
             slivers: <Widget>[
               CupertinoSliverNavigationBar(
                 border: Border(bottom: BorderSide.none),
                 largeTitle: Text('Authenticator'),
                 backgroundColor:
-                    MediaQuery.of(context).platformBrightness == Brightness.dark
-                        ? CupertinoTheme.of(context).barBackgroundColor
-                        : CupertinoTheme.of(context).scaffoldBackgroundColor,
+                    CupertinoTheme.of(context).scaffoldBackgroundColor,
                 trailing: GestureDetector(
                   onTap: () {
                     _showActionSheet(context);
@@ -132,7 +157,21 @@ class _HomePageState extends State<HomePage> {
                             margin: EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 12),
                             child: CupertinoTextField(
-                              controller: _searchController,
+                              controller: _searchTextController,
+                              onChanged: (v) {
+                                if (v.trim().isEmpty) {
+                                  setState(() {
+                                    _isTyping = false;
+                                    _showFilteredList = false;
+                                    _filteredList = [];
+                                  });
+                                } else {
+                                  setState(() {
+                                    _isTyping = true;
+                                  });
+                                  _searchSubject.add(v);
+                                }
+                              },
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12)),
                               placeholder: 'Search',
@@ -143,6 +182,25 @@ class _HomePageState extends State<HomePage> {
                                     // color: CupertinoColors.grey,
                                     size: 20),
                               ),
+                              suffix: Padding(
+                                padding: EdgeInsets.only(right: 10),
+                                child: _isTyping
+                                    ? CupertinoActivityIndicator()
+                                    : _searchTextController.text
+                                            .trim()
+                                            .isNotEmpty
+                                        ? GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                _searchTextController.text = '';
+                                                _isTyping = false;
+                                                _showFilteredList = false;
+                                                _filteredList = [];
+                                              });
+                                            },
+                                            child: Icon(CupertinoIcons.clear))
+                                        : Container(),
+                              ),
                             ),
                           ),
                       childCount: 1),
@@ -150,20 +208,20 @@ class _HomePageState extends State<HomePage> {
               ),
               (settingsState.list.isEmpty && _isLoading)
                   ? OTPShimmer()
-                  : (settingsState.list.isNotEmpty && !_isLoading)
+                  : (otpList.isNotEmpty && !_isLoading)
                       ? SliverSafeArea(
                           top: false,
                           sliver: SliverList(
                             delegate: SliverChildBuilderDelegate(
                                 (context, index) => OTPCard(
-                                      entity: settingsState.list[index],
+                                      entity: otpList[index],
                                       dangerTime: _dangerTime,
                                       onLongPress: (entity) {
                                         _showDeleteActionSheet(context, entity);
                                       },
                                       onRefresh: _fetchList,
                                     ),
-                                childCount: settingsState.list.length),
+                                childCount: otpList.length),
                           ),
                         )
                       : OTPEmpty()
