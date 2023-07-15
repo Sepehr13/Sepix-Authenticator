@@ -2,8 +2,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'home.dart';
+import 'package:sepix_authenticator/@pages/main.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -39,7 +38,7 @@ class _SplashScreenState extends State<SplashScreen>
   _proceedToNextPage() {
     Future.delayed(Duration(seconds: 4), () {
       Navigator.pushReplacement(
-          context, CupertinoPageRoute(builder: (ctx) => HomePage()));
+          context, CupertinoPageRoute(builder: (ctx) => MainPage()));
     });
   }
 

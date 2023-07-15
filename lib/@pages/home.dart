@@ -127,19 +127,21 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final SettingsState settingsState = Provider.of<SettingsState>(context);
-    return WillPopScope(
-      onWillPop: () {
-        return Future.value(false);
-      },
-      child: CupertinoPageScaffold(
-          backgroundColor: CupertinoTheme.of(context).scaffoldBackgroundColor,
+    return CupertinoTabView(
+      builder: (BuildContext context) => CupertinoPageScaffold(
+          backgroundColor:
+              CupertinoTheme.of(context).brightness == Brightness.dark
+                  ? CupertinoTheme.of(context).scaffoldBackgroundColor
+                  : CupertinoColors.systemGroupedBackground,
           child: CustomScrollView(
             slivers: <Widget>[
               CupertinoSliverNavigationBar(
                 border: Border(bottom: BorderSide.none),
-                largeTitle: Text('Authenticator'),
+                largeTitle: Text('Passwords'),
                 backgroundColor:
-                    CupertinoTheme.of(context).scaffoldBackgroundColor,
+                    CupertinoTheme.of(context).brightness == Brightness.dark
+                        ? CupertinoTheme.of(context).scaffoldBackgroundColor
+                        : CupertinoColors.systemGroupedBackground,
                 trailing: GestureDetector(
                   onTap: () {
                     _showActionSheet(context);
@@ -151,11 +153,12 @@ class _HomePageState extends State<HomePage> {
               ),
               SliverSafeArea(
                 top: false,
+                bottom: false,
                 sliver: SliverList(
                   delegate: SliverChildBuilderDelegate(
                       (ctx, index) => Container(
                             margin: EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 12),
+                                horizontal: 12, vertical: 0),
                             child: CupertinoTextField(
                               controller: _searchTextController,
                               onChanged: (v) {
